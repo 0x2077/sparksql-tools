@@ -1,0 +1,7 @@
+id      int
+dt      date
+ts      timestamp
+product varchar(250)
+mnfcode char(5)
+qty     integer
+price   double
