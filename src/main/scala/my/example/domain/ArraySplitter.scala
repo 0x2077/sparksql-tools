@@ -57,16 +57,20 @@ object ArraySplitter {
   }
 
   def processColumns(columns: List[Column], dfName: String, arrayFieldName: String): String = {
-    columns
+    val expression = columns
       .zipWithIndex
       .map {
         case (column, idx) =>
-          s"""$dfName.withColumn("${column.name}", $dfName("$arrayFieldName")($idx).cast(${covertType(column.typeName)})"""
+          s"""  col("$arrayFieldName")($idx).cast(${covertType(column.typeName)}).as("${column.name}")"""
       }
-      .mkString("\n")
+      .mkString(",\n")
+
+    s"""$dfName.select(
+       |$expression
+       |)""".stripMargin
   }
 
-  def writeResult(dir: String, fileName: String, outputFileSuffix: String, data: String) = {
+  def writeResult(dir: String, fileName: String, outputFileSuffix: String, data: String): Unit = {
     val pw = new PrintWriter(new File(s"$dir/$fileName$outputFileSuffix"))
     pw.write(data)
     pw.close()
